@@ -7,6 +7,15 @@ package io.imwj.kafka;
 public class Main {
 
     public static void main(String[] args) {
+        Integer a = 5;
+        int b = 3;
+
+        int c = a + b;
+        System.out.println(c);
+
+    }
+
+    public void test(){
         PrintTest test = new PrintTest();
         Thread t1 = new Thread("线程一") {
             public void run() {
@@ -20,7 +29,6 @@ public class Main {
         };
         t1.start();
         t2.start();
-
     }
 
 }

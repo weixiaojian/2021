@@ -73,6 +73,7 @@ bin/kafka-console-producer.sh --topic first --broker-list 192.168.153.128:9092
 bin/kafka-console-consumer.sh --topic first --bootstrap-server 192.168.153.128:9092
 ```
 
+# Kafka生产者
 ## 文件存储机制
 * Kafka 中消息是以 topic 进行分类的， 生产者生产消息，消费者消费消息，都是面向 topic的。  
 * topic 是逻辑上的概念，而 partition 是物理上的概念，每个 partition 对应于一个 log 文件，该 log 文件中存储的就是 producer 生产的数据。  
@@ -101,3 +102,19 @@ bin/kafka-console-consumer.sh --topic first --bootstrap-server 192.168.153.128:9
 * follower故障：故障后会被踢出ISR,待恢复后follower会读取本地磁盘记录的上次HW，并将log文件中高于HW的部分截取掉，从HW开始向leader同步，待follower的LEO大于等于改Partition的HW（追上leader）就可以重新加入ISR  
 * leader故障：故障后会从ISR重新选出一个leader，为保证多个的数据一致性会将其余副本高于当前leader的LEO部分截取掉，再把leader高于HW的部分同步给其他低于LEO的副本  
 * 注意： 这只能保证副本之间的数据一致性，并不能保证数据不丢失或者不重复。  
+
+## Exactly Once
+1. At Least Once：至少一次（保证数据不丢失，不保证数据重复）  
+2. At Most Once：至多一次（保证数据不重复，不保证数据不丢失）  
+3. At Least Once + 幂等性 = Exactly Once  
+4. 幂等性：enable.idompotence=true（设置幂等性）  
+    * 在初始化的时候会被分配一个PID，发往同一Partition的消息会附带SequenceNumber。而Broker端会对<PID,Partition,SeqNumber>做缓存，当具有相同主键的消息提交时，Broker只会持久化一条。  
+    * 但是PID重启就会变化，同时不同的Partition也具有不同主键，所以幂等性无法保证跨分区跨会话的ExactlyOnce。  
+
+
+# Kafka消费者
+* 消费者采用pull（拉）模式从broker中读取数据。Kafka的消费者在消费数据时会传入一个时长参数timeout，如果当前没有数据可供消费，consumer会等待一段时间之后再返回，这段时长即为timeout。
+## 分区分配策略（消费者数量改变就会触发）
+1. RoundRobin：轮询（根据组来划分）
+    
+2. Range：范围（根据主题来划分）

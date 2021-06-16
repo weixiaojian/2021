@@ -1,4 +1,4 @@
-## kafka相关
+# 1.kafka相关
 > Kafka 是一个分布式的基于发布/订阅模式的消息队列  
 > 异步、解耦、削峰
 
@@ -31,7 +31,7 @@ clientPort=2181     #端口
 maxClientCnxns=0    
 ```
 
-## kafka命令
+# 2.kafka命令
 * 查看启动状态（jdk自带）
 ```
 jps
@@ -73,7 +73,7 @@ bin/kafka-console-producer.sh --topic first --broker-list 192.168.153.128:9092
 bin/kafka-console-consumer.sh --topic first --bootstrap-server 192.168.153.128:9092
 ```
 
-# Kafka生产者
+# 3.1Kafka生产者
 ## 文件存储机制
 * Kafka 中消息是以 topic 进行分类的， 生产者生产消息，消费者消费消息，都是面向 topic的。  
 * topic 是逻辑上的概念，而 partition 是物理上的概念，每个 partition 对应于一个 log 文件，该 log 文件中存储的就是 producer 生产的数据。  
@@ -112,9 +112,11 @@ bin/kafka-console-consumer.sh --topic first --bootstrap-server 192.168.153.128:9
     * 但是PID重启就会变化，同时不同的Partition也具有不同主键，所以幂等性无法保证跨分区跨会话的ExactlyOnce。  
 
 
-# Kafka消费者
+# 3.2Kafka消费者
 * 消费者采用pull（拉）模式从broker中读取数据。Kafka的消费者在消费数据时会传入一个时长参数timeout，如果当前没有数据可供消费，consumer会等待一段时间之后再返回，这段时长即为timeout。
 ## 分区分配策略（消费者数量改变就会触发）
 1. RoundRobin：轮询（根据组来划分）
     
 2. Range：范围（根据主题来划分）
+
+# 4.Kafka开发api

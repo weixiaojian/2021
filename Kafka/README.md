@@ -10,7 +10,7 @@
 ![image](https://raw.githubusercontent.com/weixiaojian/2021/master/Kafka/img/001.png)
 
 * 工作流程  
-![image](https://raw.githubusercontent.com/weixiaojian/2021/master/Kafka/img/001.png)
+![image](https://raw.githubusercontent.com/weixiaojian/2021/master/Kafka/img/002.png)
 
 ## 安装
 * 解压安装包

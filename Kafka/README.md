@@ -50,27 +50,27 @@ jps
 partitions：分区数
 replication-factor：副本数
 
-bin/kafka-topics.sh --create --zookeeper 192.168.153.128:2181 --topic first --partitions 1 --replication-factor 3
+bin/kafka-topics.sh --create --zookeeper 192.168.31.129:2181 --topic first --partitions 1 --replication-factor 3
 ```
 * 删除主题（first）
 ```
-bin/kafka-topics.sh --delete --zookeeper 192.168.153.128:2181 --topic first
+bin/kafka-topics.sh --delete --zookeeper 192.168.31.129:2181 --topic first
 ```
 * 查看所有主题
 ```
-bin/kafka-topics.sh --list --zookeeper 192.168.153.128:2181 
+bin/kafka-topics.sh --list --zookeeper 192.168.31.129:2181 
 ```
 * 查看主题详情（first）
 ```
-bin/kafka-topics.sh --describe --zookeeper 192.168.153.128:2181 --topic first
+bin/kafka-topics.sh --describe --zookeeper 192.168.31.129:2181 --topic first
 ```
 * 连接生产者控制台
 ```
-bin/kafka-console-producer.sh --topic first --broker-list 192.168.153.128:9092
+bin/kafka-console-producer.sh --topic first --broker-list 192.168.31.129:9092
 ```
 * 连接消费者控制台
 ```
-bin/kafka-console-consumer.sh --topic first --bootstrap-server 192.168.153.128:9092
+bin/kafka-console-consumer.sh --topic first --bootstrap-server 192.168.31.129:9092
 ```
 
 # 3.1Kafka生产者
@@ -120,3 +120,100 @@ bin/kafka-console-consumer.sh --topic first --bootstrap-server 192.168.153.128:9
 2. Range：范围（根据主题来划分）
 
 # 4.Kafka开发api
+> Kafka 的 Producer 发送消息采用的是异步发送的方式。在消息发送的过程中，涉及到了两个线程——main 线程和 Sender 线程，以及一个线程共享变量——RecordAccumulator。   
+
+1.发送消息到服务器
+```
+    public static void main(String[] args) {
+
+        //1.创建kafka生产者的配置信息
+        Properties props = new Properties();
+        //连接地址
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.31.129:9092");
+        //应答级别
+        props.put(ProducerConfig.ACKS_CONFIG, "all");
+        //重试次数
+        props.put("retries", 1);
+        //批次大小
+        props.put("batch.size", 16384);
+        //等待时间（毫秒）
+        props.put("linger.ms", 1);
+        //RecordAccumulator 缓冲区大小（32m）
+        props.put("buffer.memory", 33554432);
+        //key、value所使用的序列化器
+        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+
+        //2.创建生产者对象
+        KafkaProducer producer = new KafkaProducer<String, String>(props);
+
+        //3.发送数据
+        for (int i = 0; i < 10; i++) {
+            producer.send(new ProducerRecord<String, String>("first","hello: " + i));
+        }
+
+        //4.关闭连接(必须要关闭 否则消息不会发送出去)
+        producer.close();
+    }
+```
+2.带回调的生产者API
+```
+    public static void main(String[] args) {
+        //1.创建kafka生产者的配置信息
+        Properties props = new Properties();
+        //连接地址
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.31.129:9092");
+        //key、value所使用的序列化器
+        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+
+        //2.创建生产者对象
+        KafkaProducer producer = new KafkaProducer<String, String>(props);
+
+        //3.发送数据
+        for (int i = 0; i < 10; i++) {
+            producer.send(new ProducerRecord<String, String>("first", 0, "at", "hello: " + i), (metadata, e) -> {
+                System.out.println(metadata.partition() + "----" + metadata.offset());
+                System.out.println(metadata.topic() + "----" + metadata.toString());
+            });
+        }
+
+        //4.关闭连接(必须要关闭 否则消息不会发送出去)
+        producer.close();
+    }
+```
+
+3.消费者demo
+```
+    public static void main(String[] args) {
+        //1.创建kafka生产者的配置信息
+        Properties props = new Properties();
+        //主机地址
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.31.129:9092");
+        //自动提交开关
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
+        //自动提交延时
+        props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000");
+        //key、value所使用的序列化器
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+        //消费者组
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "bigdata");
+
+        //2.创建消费者
+        KafkaConsumer consumer = new KafkaConsumer<String, String>(props);
+
+        //3.订阅主题
+        consumer.subscribe(Arrays.asList("first"));
+
+        while (true){
+            //4.获取数据
+            ConsumerRecords<String,String> records = consumer.poll(100);
+
+            //5.遍历数据
+            for(ConsumerRecord<String, String> consumerRecord : records){
+                System.out.println(consumerRecord.key() + " --- " + consumerRecord.value());;
+            }
+        }
+    }
+```

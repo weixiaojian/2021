@@ -7,11 +7,12 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import java.util.Properties;
 
 /**
- * kafka生产者
+ * 使用自定义分区器的生产者
+ *
  * @author langao_q
- * @since 2021-06-16 15:59
+ * @since 2021-07-20 15:50
  */
-public class MyProducer {
+public class PartitionProducer {
 
     public static void main(String[] args) {
         //1.创建kafka生产者的配置信息
@@ -32,12 +33,17 @@ public class MyProducer {
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 
+        //使用自定义分区器
+        props.put("partitioner.class", "io.imwj.kafka.partitioner.MyPartitioner");
+
         //2.创建生产者对象
         KafkaProducer producer = new KafkaProducer<String, String>(props);
 
         //3.发送数据
         for (int i = 0; i < 10; i++) {
-            producer.send(new ProducerRecord<String, String>("first","test","hello: " + i));
+            producer.send(new ProducerRecord<String, String>("first2", 0, "at", "hello: " + i), (metadata, e) -> {
+                System.out.println(metadata.partition() + "----" + metadata.offset());
+            });
         }
 
         //4.关闭连接(必须要关闭 否则消息不会发送出去)

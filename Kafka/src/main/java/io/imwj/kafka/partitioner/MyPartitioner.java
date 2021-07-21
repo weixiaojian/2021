@@ -25,7 +25,7 @@ public class MyPartitioner implements Partitioner{
     public int partition(String topic, Object key, byte[] keyBytes, Object value, byte[] valueBytes, Cluster cluster) {
         //获取所有可用分区
         Integer integer = cluster.partitionCountForTopic(topic);
-        return 1;
+        return 0;
     }
 
     @Override

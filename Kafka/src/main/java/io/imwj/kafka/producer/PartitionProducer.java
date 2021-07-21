@@ -41,7 +41,7 @@ public class PartitionProducer {
 
         //3.发送数据
         for (int i = 0; i < 10; i++) {
-            producer.send(new ProducerRecord<String, String>("first2", 0, "at", "hello: " + i), (metadata, e) -> {
+            producer.send(new ProducerRecord<String, String>("first2",  "at", "hello: " + i), (metadata, e) -> {
                 System.out.println(metadata.partition() + "----" + metadata.offset());
             });
         }

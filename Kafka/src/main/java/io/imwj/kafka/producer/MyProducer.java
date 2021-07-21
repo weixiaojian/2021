@@ -37,7 +37,7 @@ public class MyProducer {
 
         //3.发送数据
         for (int i = 0; i < 10; i++) {
-            producer.send(new ProducerRecord<String, String>("first","test","hello: " + i));
+            producer.send(new ProducerRecord<String, String>("first2","test1","hello: " + i));
         }
 
         //4.关闭连接(必须要关闭 否则消息不会发送出去)

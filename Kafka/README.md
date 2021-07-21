@@ -198,13 +198,15 @@ bin/kafka-console-consumer.sh --topic first --bootstrap-server 192.168.31.129:90
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
         //消费者组
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "bigdata");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "bigdata1");
+        //重置消费者的offset（配置earliest + 切换消费者组 或 数据过期 = 可消费生产者最初的未消费数据）
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         //2.创建消费者
         KafkaConsumer consumer = new KafkaConsumer<String, String>(props);
 
         //3.订阅主题
-        consumer.subscribe(Arrays.asList("first"));
+        consumer.subscribe(Arrays.asList("first2"));
 
         while (true){
             //4.获取数据
@@ -213,6 +215,7 @@ bin/kafka-console-consumer.sh --topic first --bootstrap-server 192.168.31.129:90
             //5.遍历数据
             for(ConsumerRecord<String, String> consumerRecord : records){
                 System.out.println(consumerRecord.key() + " --- " + consumerRecord.value());;
+                System.out.println(consumerRecord.partition() + " --- " + consumerRecord.offset());;
             }
         }
     }

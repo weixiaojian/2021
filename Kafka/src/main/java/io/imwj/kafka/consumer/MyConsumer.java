@@ -36,7 +36,7 @@ public class MyConsumer {
         KafkaConsumer consumer = new KafkaConsumer<String, String>(props);
 
         //3.订阅主题
-        consumer.subscribe(Arrays.asList("first2"));
+        consumer.subscribe(Arrays.asList("first"));
 
         while (true){
             //4.获取数据
@@ -47,6 +47,8 @@ public class MyConsumer {
                 System.out.println(consumerRecord.key() + " --- " + consumerRecord.value());;
                 System.out.println(consumerRecord.partition() + " --- " + consumerRecord.offset());;
             }
+            //同步提交，当前线程会阻塞直到 offset 提交成功
+            consumer.commitSync();
         }
     }
 

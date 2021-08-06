@@ -191,7 +191,7 @@ bin/kafka-console-consumer.sh --topic first --bootstrap-server 192.168.31.129:90
         //主机地址
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.31.129:9092");
         //自动提交开关
-        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         //自动提交延时
         props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000");
         //key、value所使用的序列化器
@@ -206,7 +206,7 @@ bin/kafka-console-consumer.sh --topic first --bootstrap-server 192.168.31.129:90
         KafkaConsumer consumer = new KafkaConsumer<String, String>(props);
 
         //3.订阅主题
-        consumer.subscribe(Arrays.asList("first2"));
+        consumer.subscribe(Arrays.asList("first"));
 
         while (true){
             //4.获取数据
@@ -217,6 +217,109 @@ bin/kafka-console-consumer.sh --topic first --bootstrap-server 192.168.31.129:90
                 System.out.println(consumerRecord.key() + " --- " + consumerRecord.value());;
                 System.out.println(consumerRecord.partition() + " --- " + consumerRecord.offset());;
             }
+            //同步提交，当前线程会阻塞直到 offset 提交成功
+            consumer.commitSync();
         }
     }
+```
+
+## 消费者自动提交与手动提交（同步/异步）
+* 自动提交
+```
+    //自动提交开关
+    props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
+```
+
+* 手动提交（同步/异步）
+```
+    //关闭自动提交开关
+    props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+    
+    //同步提交，当前线程会阻塞直到 offset 提交成功
+    consumer.commitSync();
+    
+    //异步提交
+    consumer.commitAsync(new OffsetCommitCallback() {
+        @Override
+        public void onComplete(Map<TopicPartition,
+                                OffsetAndMetadata> offsets, Exception exception) {
+            if (exception != null) {
+                System.err.println("Commit failed for" +
+                        offsets);
+            }
+        }
+    });
+```
+
+## 自定义拦截器(org.apache.kafka.clients.producer.ProducerInterceptor)
+* configure(configs)
+获取配置信息和初始化数据时调用。
+
+* onSend(ProducerRecord)：消息发送前
+该方法封装进 KafkaProducer.send 方法中，即它运行在用户主线程中。Producer确保在消息被序列化以及计算分区前调用该方法。用户可以在该方法中对消息做任何操作。
+
+* onAcknowledgement(RecordMetadata, Exception)：消息发送后（成功/失败）
+该方法会在消息从 RecordAccumulator 成功发送到 Kafka Broker 之后，或者在发送过程中失败时调用。
+
+* close：
+关闭 interceptor，主要用于执行一些资源清理工作
+
+* 创建拦截器
+```
+public class CountIntercept implements ProducerInterceptor<String, String> {
+
+    Integer successCount = 0;
+    Integer errorCount = 0;
+
+    @Override
+    public void configure(Map<String, ?> configs) {
+
+    }
+
+    /**
+     * 增加时间戳
+     * @param record
+     * @return
+     */
+    @Override
+    public ProducerRecord<String, String> onSend(ProducerRecord<String, String> record) {
+        //1.取出value数据
+        String value = record.value();
+        //2.增加时间戳
+        value = System.currentTimeMillis() + "," + value;
+        //3.创建一个新的对象返回
+        return new ProducerRecord<String, String>(record.topic(), record.partition(), record.timestamp(), record.key(), value);
+    }
+
+    /**
+     * 统计成功和失败条数
+     * @param metadata
+     * @param exception
+     */
+    @Override
+    public void onAcknowledgement(RecordMetadata metadata, Exception exception) {
+        if(metadata != null){
+            successCount ++;
+        }else{
+            errorCount ++;
+        }
+    }
+
+    @Override
+    public void close() {
+        System.out.println("successCount:" + successCount);
+        System.out.println("errorCount:" + errorCount);
+    }
+}
+```
+
+* 使用拦截器
+```
+    //1.创建kafka生产者的配置信息
+    Properties props = new Properties();
+    
+    //2.配置拦截器拦截器
+    ArrayList<String> interceptorList = new ArrayList<>();
+    interceptorList.add("io.imwj.kafka.intercept.CountIntercept");
+    props.put("interceptor.classes", interceptorList);
 ```

@@ -43,7 +43,7 @@ import java.util.Properties;
         KafkaProducer producer = new KafkaProducer<String, String>(props);
 
         //3.发送数据
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10000; i++) {
             producer.send(new ProducerRecord<String, String>("first","test1","hello: " + i));
         }
 

@@ -323,3 +323,5 @@ public class CountIntercept implements ProducerInterceptor<String, String> {
     interceptorList.add("io.imwj.kafka.intercept.CountIntercept");
     props.put("interceptor.classes", interceptorList);
 ```
+
+# Kafka监控(Eagle)

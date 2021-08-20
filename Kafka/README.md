@@ -325,3 +325,34 @@ public class CountIntercept implements ProducerInterceptor<String, String> {
 ```
 
 # Kafka监控(Eagle)
+* 修改kafka-server-start.sh：if [ "x$KAFKA_HEAP_OPTS" = "x" ]; then里增加下面这段代码
+```
+    export KAFKA_HEAP_OPTS="-server -Xms2G -Xmx2G -XX:PermSize=128m 
+    -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=8 -
+    XX:ConcGCThreads=5 -XX:InitiatingHeapOccupancyPercent=70"
+    export JMX_PORT="9999"
+```
+* 上传/解压/改名kafka-eagle-bin-1.3.7.tar.gz包
+* 修改配置文件
+```
+cluster1.zk.list=127.0.0.1:2181
+cluster1.kafka.eagle.offset.storage=kafka
+kafka.eagle.metrics.charts=true
+
+#数据库配置
+kafka.eagle.driver=com.mysql.jdbc.Driver
+kafka.eagle.url=jdbc:mysql://127.0.0.1:3306/ke?useUnicode=true&ch
+aracterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
+kafka.eagle.username=root
+kafka.eagle.password=123456
+```
+* 添加环境变量：注意source /etc/profile
+```
+export KE_HOME=/data/kafka/eagle
+export PATH=$PATH:$KE_HOME/bin
+```
+* 启动Eagle
+```
+bin/ke.sh start
+```
+* 访问网页：[http://192.168.9.102:8048/ke](http://192.168.9.102:8048/ke)，账号admin 密码123456

@@ -403,4 +403,19 @@ bin/ke.sh start
 ```
 * 访问网页：[http://192.168.9.102:8048/ke](http://192.168.9.102:8048/ke)，账号admin 密码123456
 
-## kafka面试相关
+## kafka与springboot可以参考
+一个博主的文章：[https://blog.csdn.net/yuanlong122716/article/details/105160545/](https://blog.csdn.net/yuanlong122716/article/details/105160545/)
+
+## 记一次Java远程连接kafka生产者的问题
+* 报错：找不到Host配置错误
+```
+18:55:46.237 [kafka-producer-network-thread | producer-1] WARN org.apache.kafka.clients.NetworkClient - [Producer clientId=producer-1] Error connecting to node iZuf688uiv7i1onjv82rf8Z:8318 (id: 10 rack: null)
+java.net.UnknownHostException: iZuf688uiv7i1onjv82rf8Z
+	at java.net.InetAddress.getAllByName0(InetAddress.java:1280)
+	at java.net.InetAddress.getAllByName(InetAddress.java:1192)
+	at java.net.InetAddress.getAllByName(InetAddress.java:1126)
+```
+* 解决方案：在本地电脑上的host文件中添加
+```
+服务器ip iZuf688uiv7i1onjv82rf8Z
+```

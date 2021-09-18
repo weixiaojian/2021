@@ -407,7 +407,8 @@ bin/ke.sh start
 一个博主的文章：[https://blog.csdn.net/yuanlong122716/article/details/105160545/](https://blog.csdn.net/yuanlong122716/article/details/105160545/)
 
 ## 记一次Java远程连接kafka生产者的问题
-* 报错：找不到Host配置错误
+* 报错：找不到Host配置错误，或者直接连接不上
+* 原因：kafka没有开启允许外网请求访问，
 ```
 18:55:46.237 [kafka-producer-network-thread | producer-1] WARN org.apache.kafka.clients.NetworkClient - [Producer clientId=producer-1] Error connecting to node iZuf688uiv7i1onjv82rf8Z:8318 (id: 10 rack: null)
 java.net.UnknownHostException: iZuf688uiv7i1onjv82rf8Z
@@ -415,7 +416,13 @@ java.net.UnknownHostException: iZuf688uiv7i1onjv82rf8Z
 	at java.net.InetAddress.getAllByName(InetAddress.java:1192)
 	at java.net.InetAddress.getAllByName(InetAddress.java:1126)
 ```
-* 解决方案：在本地电脑上的host文件中添加
+* 解决方案1：在本地电脑上的host文件中添加（不推荐）
 ```
 服务器ip iZuf688uiv7i1onjv82rf8Z
+```
+
+* 解决方案2：修改kafka配置（推荐）,advertised.listeners相当于一个nginx进行了转发
+```
+listeners=PLAINTEXT://:8318
+advertised.listeners=PLAINTEXT://[主机的外网ip]:对外端口
 ```

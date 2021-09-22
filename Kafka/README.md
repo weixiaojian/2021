@@ -426,3 +426,21 @@ java.net.UnknownHostException: iZuf688uiv7i1onjv82rf8Z
 listeners=PLAINTEXT://:8318
 advertised.listeners=PLAINTEXT://[主机的外网ip]:对外端口
 ```
+
+## 查看kafka当前消费情况
+* 查看所有topic分组
+```
+bin/kafka-consumer-groups.sh --bootstrap-server 127.0.0.1:8318 --list
+```
+
+* 查看指定分组的消费情况
+```
+./bin/kafka-consumer-groups.sh --describe --bootstrap-server 127.0.0.1:8318 --group [分组名称]
+```
+* 参数解析  
+GROUP：分组id  
+TOPIC：TOPIC名称  
+PARTITION：分区id  
+CURRENT-OFFSET：当前已消费的条数  
+LOG-END-OFFSET：总条数   
+LAG：未消费的条数

@@ -23,6 +23,7 @@ public class LogRecordAspect {
 
     @Autowired
     private HttpServletRequest request;
+
     /**
      * 配置切入点表达式
      */

@@ -10,6 +10,7 @@ import java.util.HashSet;
 /**
  * 很难避免完全同步
  * 只能通过缩小需要同步的范围 + ThreadLocal解决问题（空间换时间）
+ *
  * @author langao_q
  * @since 2021-03-26 16:17
  */
@@ -22,9 +23,9 @@ public class StatController {
         set.add(v);
     }
 
-    static ThreadLocal<Val<Integer>> c = new ThreadLocal<Val<Integer>>(){
+    static ThreadLocal<Val<Integer>> c = new ThreadLocal<Val<Integer>>() {
         @Override
-        public Val<Integer> initialValue(){
+        public Val<Integer> initialValue() {
             Val<Integer> v = new Val<>();
             v.set(0);
             //set.add(v); //线程不安全
@@ -34,7 +35,7 @@ public class StatController {
     };
 
     @RequestMapping("stat")
-    public Integer stat(){
+    public Integer stat() {
         return set.stream().map(x -> x.get()).reduce((a, x) -> a + x).get();
     }
 

@@ -8,9 +8,9 @@ import io.imwj.threadlocal.entity.MyThreadLocal;
  */
 public class Test {
 
-    static MyThreadLocal<Long> threadLocal = new MyThreadLocal<Long>(){
+    static MyThreadLocal<Long> threadLocal = new MyThreadLocal<Long>() {
         @Override
-        protected Long initialValue(){
+        protected Long initialValue() {
             return Thread.currentThread().getId();
         }
     };

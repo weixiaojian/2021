@@ -15,7 +15,7 @@ public class Main {
 
     }
 
-    public void test(){
+    public void test() {
         PrintTest test = new PrintTest();
         Thread t1 = new Thread("线程一") {
             public void run() {

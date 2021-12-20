@@ -8,6 +8,7 @@ import java.util.Properties;
 
 /**
  * kafka生产者
+ *
  * @author langao_q
  * @since 2021-06-16 15:59
  */
@@ -37,7 +38,7 @@ public class MyProducer {
 
         //3.发送数据
         for (int i = 0; i < 10; i++) {
-            producer.send(new ProducerRecord<String, String>("first","test1","hello: " + i));
+            producer.send(new ProducerRecord<String, String>("first", "test1", "hello: " + i));
         }
 
         //4.关闭连接(必须要关闭 否则消息不会发送出去)

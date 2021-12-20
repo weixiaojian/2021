@@ -7,10 +7,11 @@ package io.imwj.kafka;
 public class PrintTest {
 
     private static int count = 100;
+
     public void printTest() {
-        synchronized (this){
+        synchronized (this) {
             this.notify();
-            while (count > 0){
+            while (count > 0) {
                 System.out.println(Thread.currentThread().getName() + "：" + count);
                 count--;
                 try {

@@ -41,12 +41,12 @@ public class MyConsumer2 {
         //3.订阅主题
         consumer.subscribe(Arrays.asList("first"));
 
-        while (true){
+        while (true) {
             //4.获取数据
-            ConsumerRecords<String,String> records = consumer.poll(1);
+            ConsumerRecords<String, String> records = consumer.poll(1);
             //5.遍历数据
-            for(ConsumerRecord<String, String> consumerRecord : records){
-                System.out.println(" 拉取数据--- " + consumerRecord.value());;
+            for (ConsumerRecord<String, String> consumerRecord : records) {
+                System.out.println(" 拉取数据--- " + consumerRecord.value());
             }
             //同步提交，当前线程会阻塞直到 offset 提交成功
             consumer.commitSync();

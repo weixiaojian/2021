@@ -8,6 +8,7 @@ import java.util.Map;
 
 /**
  * 增加时间戳/统计拦截器
+ *
  * @author langao_q
  * @since 2021-08-06 16:35
  */
@@ -23,6 +24,7 @@ public class CountIntercept implements ProducerInterceptor<String, String> {
 
     /**
      * 增加时间戳
+     *
      * @param record
      * @return
      */
@@ -38,15 +40,16 @@ public class CountIntercept implements ProducerInterceptor<String, String> {
 
     /**
      * 统计成功和失败条数
+     *
      * @param metadata
      * @param exception
      */
     @Override
     public void onAcknowledgement(RecordMetadata metadata, Exception exception) {
-        if(metadata != null){
-            successCount ++;
-        }else{
-            errorCount ++;
+        if (metadata != null) {
+            successCount++;
+        } else {
+            errorCount++;
         }
     }
 

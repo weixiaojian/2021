@@ -8,10 +8,11 @@ public class Val<T> {
 
     T val;
 
-    public void set(T _val){
+    public void set(T _val) {
         val = _val;
     }
-    public T get(){
+
+    public T get() {
         return val;
     }
 

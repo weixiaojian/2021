@@ -1,4 +1,4 @@
-# Java面试-100题
+# Java面试
 > B站地址：[https://www.bilibili.com/video/BV1Eb4y1R7zd?spm_id_from=333.999.0.0](https://www.bilibili.com/video/BV1Eb4y1R7zd?spm_id_from=333.999.0.0)
 
 ## 1.面向对象
@@ -47,7 +47,7 @@
 
 ## ArrayList和LinkedList区别
 * ArrayList：底层是动态数组，连续的内存空间存储，相对查询性能高、线程不安全、轻量级、初始化10，每次扩容为x1.5
-* LinkedList：底层是双向循环链表，相对增删效率高，线程不安全，轻量级
+* LinkedList：底层是双向循环链表，相对增删效率高，线程不安全，轻量级;同时实现了Deque接口 可以当作双端队列使用
 
 ## HashMap和HashTable有什么区别？其底层实现是什么？
 * HashMap方法没有synchronized修饰，线程非安全，HashTable线程安全

@@ -34,4 +34,29 @@
 * 基于共享内存或基于网络
 * 如果是共享内存的话则是wait(),notify()
 
-## spring源码
+## spring的大致流程
+* Spring是一个轻量级的控制反转（IoC)和面向切面（AOP）的容器框架，这里主要讲一下spring的启动流程(创建spring容器)
+* 1.进行扫描，得到所有的BeanDefinition对象 储存到map中
+* 2.筛选出非懒加载的单例BeanDefinition进行创建Bean，对于多例和懒加载的Bean 会在每次获取Bean的时候利用BeanDefinition去创建
+* 3.利用BeanDefinition创建Bean(创建生命周期)，期间包含合并BeanDefinition、推断构造方法、实例化、属性填充、初始化前、初始化、初始化后(AOP)等
+* 4.单例Bean创建完成之后，spring会发布一个容器启动事件
+* 5.同时spring启动时会提供一些模板方法 让子类来实现
+* 6.启动过程中处理@Import等注解
+* 7.Spring启动完成
+
+## spring事务机制
+* spring的事务是基于数据库事务和AOP机制的
+* 对于使用了@Transactional注解的Bean，spring会创建一个代理对象Bean
+* 当调用代理对象方法时 会判断该方法是否加了@Transactional注解 如果加了则会使用事务管理器创建一个数据库连接
+* 并且会修改数据库连接的autocommit属性为false，关闭自动提交
+* 然后执行当前方法 执行sql
+* 如果出现了异常 并且这个异常是需要回滚事务的话就会回滚事务，否则仍然提交事务
+* 其他：spring的事务隔离级别就是数据库的隔离级别，spring事务的传播机制是自己实现的 一个事务就是一个数据库连接
+
+## spring事务什么时候会失效
+* spring事务的原理就是AOP进行了切面增强，AOP不起作用时就会失效 如下：
+* 发生自调用：类中使用this调用本来方法
+* 方法不是public（@Transactional只支持public）,如果非要非public的话可以开启Aspectj代理模式
+* 数据库不支持事务
+* 类没有交给spring管理
+* 异常没有抛出

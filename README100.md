@@ -224,7 +224,7 @@
 * 作用域是原型的话每次创建一个新对象 线程之间不存在bean共享，也就不存在线程安全的问题
 * 作用域是单例的话 所有线程共享一个实例就会存在资源竞争， 对此可以使用ThreadLocal来解决线程安全的问题（ThreadLocal为每个线程保存线程私有数据）
 
-## Spring中使用了那些涉及模式
+#### Spring中使用了那些设计模式
 * 简单工厂：由一个工厂类根据传入参数，动态去决定创建哪一个产品类； Spring中的BeanFactory就是简单工厂模式的实现 根据传入的一个唯一标识来获得Bean对象
 * 工厂模式：实现了BeanFactory接口的bean是一类叫做factory的bean，特点是spring会在使用getBean()获取该bean时 会自动调用这个bean的getObject()方法（实际返回的时getObject()方法的返回值）
 * 单例模式：保证一个类只有一个实例 并提供一个访问它的全局访问点；spring中就是提供了全局访问点BeanFactory

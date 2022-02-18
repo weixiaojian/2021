@@ -103,3 +103,58 @@
 * 线程池将线程和任务进行了解耦，摆脱了之前通过Thread创建线程时的一个任务对应一个线程的限制；更重要的是线程池对Thread进行了封装 并不是每次调用Thread.start来创建线程 而是将run方法当作一个普通方法来执行了
 
 # Spring相关
+## 22.spring是什么
+* 轻量级的j2ee开源框架，是一个容器框架 用来装java对象；核心概念是IOC(控制反转)，AOP(切面编程)；将各个组件和其他框架组合成复杂的应用；
+
+## 23.IOC的理解
+* 容器：spring本身就是一个容器，项目启动时spring会读取配置文件中的bean然后创建好对象放入容器中；
+* 控制反转：正常情况下A中有B对象的引用 必须要A去主动创建B，引入spring之后 项目启动时所有标记对象都会启动好 并将B注入到A中
+* 依赖注入：IOC容器在运行期间 动态的将依赖关系注入到对象之中
+
+## 24.IOC大致流程
+* 配置文件中配置要扫描的包路径
+* 定义一些注解，标识要放入容器的bean 以及依赖注入、获取配置信息等
+* 项目启动时 读取配置文件中的包路径，将该路径下的所有的class文件添加到一个Set集合中
+* 遍历上面的Set集合 获取到有标识需要放入容器注解的bean，将这些bean存放到IOC容器的Map中
+* 遍历整个IOC容器 获取到每一个bean的实例，然后针对有标识依赖注入的bean进行递归依赖注入
+
+## 25.AOP的理解
+* 将程序中交叉的业务逻辑(日志、事务等)，封装成一个切面 然后注入到目标对象中；
+* 可以对某些对象进行增强，也可以在某些方法执行前和执行后处理额外的事情
+
+## 26.BeanFactory和ApplicationContext区别
+* ApplicationContext是BeanFactory的子接口 功能也更强大(支持国际化、加载多个配置文件等等)
+* BeanFactory是延迟加载的形式加载bean(使用时才创建)，ApplicationContext在初始化的时候就加载好了所有bean 这样更有利于检查依赖属性是否注入
+* ApplicationContext占的内存更高 启动更慢，但还能以声明的方式创建(使用ContextLoad )
+
+## 27.bean的生命周期
+* 
+
+## 28.bean的几种作用域
+* 单例：默认，每个容器中只有一个bean的实例，单例模式有BeanFactory自身来维护在第一次注入时被创建
+* 原型：为每个bean请求都创建一个bean实例，所以每次注入的时候都是一个新对象
+* request：bean被定义在每次http请求中创建，单次请求中都是同一个bean对象
+* session：与request相似，确保每个session中都有一个bean  会话过期后bean就会失效
+* application：bean被定义在ServletContext周期中 复用一个对象实例
+* websocket：bean被定义在webscoket周期中复用一个对象实例
+
+## 29.bean的生命周期
+* 1.解析类得到BeanDefinition
+* 2.确定构造方法
+* 3.进行实例化 得到一个对象
+* 4.对对象中添加了@Autowired注解的属性进行属性填充
+* 5.回调Aware 如：BeanNameAware、BeanFactoryAware
+* 6.调用BeanPostProcessor的初始化前方法
+* 7.调用初始化方法
+* 8.调用BeanPostProcessor的初始化后方法 这里会进行AOP
+* 9.如果bean是单例 还会将bean放到单例池里面
+
+## 30.bean是线程安全的吗
+* spring中的bean默认是单例的(线程不安全的)，同时框架也没有对bean做额外的处理 如果bean是无状态的那么自然就是线程安全的，bean是有状态的话那么就是线程不安全的
+* 想要做到线程安全 可以将bean的作用域指定为“原型” 这样每次获得的bean都是新的
+
+## 31.spring中用到了那些设计模式
+* 简单工厂：工厂类根据传入参数 动态的决定创建类；BeanFactory就是简单工厂的一种实现，根据传入一个唯一标识来获得bean对象
+* 单例模式：保证一个类只有一个实例 并提高全局访问点；spring中的单例模式就是一种实现 并提供了全局访问点BeanFactory
+* 动态代理：切面在应用运行时被织入；spring中的AOP会为目标对象动态的创建一个代理对象 并织入相应的逻辑
+* 模板方法：父类定义好了骨架 某些特定方法由子类实现；spring中的JdbcTemplater等就是用到了模板方法

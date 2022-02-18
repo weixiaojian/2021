@@ -158,3 +158,42 @@
 * 单例模式：保证一个类只有一个实例 并提高全局访问点；spring中的单例模式就是一种实现 并提供了全局访问点BeanFactory
 * 动态代理：切面在应用运行时被织入；spring中的AOP会为目标对象动态的创建一个代理对象 并织入相应的逻辑
 * 模板方法：父类定义好了骨架 某些特定方法由子类实现；spring中的JdbcTemplater等就是用到了模板方法
+
+## 32.spring事务实现以及隔离级别
+* spring默认有两种事务方式（编程式、声明式），@Transactional注解就是声明式的；
+* @Transactional原理：在方法上加上该注解后 spring会为基于这个类生成一个代理对象 将这个代理对象作为bean，代理逻辑中先将事务的自动提交设置为false 然后根据代码是否抛出异常来决定事务的提交；默认情况一下会对RunTimeException和Error进行回滚
+* 事务失效的情况：发生自调用 不经过spring代理对象；bean没有被spring管理；方法不是public；没有抛出异常；数据库不支持事务；
+* 事务隔离级别：read uncommitted(未提交读)；read committed(提交读 不可重复读 oracle默认)；repeatable read(可重复读 mysql默认)；serializable(可串行化)；
+
+## 33.spring事务的传播机制
+* REQUIRED(默认)：当前有事务就加入这个事务，当前没有事务则新建事务
+* SUPPORTS：当前存在事务就加入这个事务，当前没有事务就以非事务方式执行
+* MANDATORY：当前存在事务就加入这个事务，当前没有事务则抛出异常
+* REQUIRED_NEW：当前存在事务就挂起该事务，自己新建一个事务
+* NOT_SUPPORTS：当前存在事务就挂起该事务，自己以非事务方式运行
+* NEVER：当前存在事务就抛出异常，没有事务就不使用事务
+* NESTED：当前存在事务就嵌套在里面执行，没有事务就新建事务
+
+## 34.springmvd工作流程
+* 1.前端控制器DipatcherServlet收到用户请求
+* 2.前端控制器调用处理器映射器HandleMappering，根据注解、xml配置等获取到处理器和拦截器 返回给前端控制器
+* 3.前端控制器再调用处理器适配器HandleAdapter，经过适配得到具体的处理器Controller
+* 4.处理器执行实际的业务逻辑 返回ModelAndView给到前端控制器
+* 5.前端控制器再将ModelAndView传给视图解析器ViewReslover视图解析器，视图解析器解析数据返回view给前端控制器
+* 6.前端控制器根据view渲染页面 响应给用户
+
+## 35.springmvc的九大组件
+* 处理器映射器：HandleMapping
+* 处理器适配器：HandleAdpter
+* 视图解析器：ViewReslover
+
+## 36.springboot自动装配
+* 自动装配的实现就是为了从spring.factories文件中获取到对应的bean对象 并且由IOC容器来进行管理
+* @SpringBootConfiguration：springboot自己封装的Configuration
+* @ComponentScan：指定要扫描的路径
+* @EnableAutoConfiguration：@Import(AutoConfigurationImportSelector.class)  重点方法selectImports
+* 1.当springboot程序启动的时候 会先创建SpringApplication对象，在这个过程中会加载程序中的spring.factories文件 并将文件放到缓存中
+* 2.SpringApplication对象创建完成后 开始执行run方法，其中有两个核心方法(prepareContext、refreshContext)完成了自动装配的核心功能 包含：上下文对象的创建、banner打印、异常报告期
+* 3.prepareContext方法主要未上下文对象的创建，其中的load方法会将启动类做未一个BeanDefinition注册到registry；同时会解析@SpringBootApplication，@EnableAutoConfiguration等注解
+* 4.refreshContext方法主要会进行整个容器的刷新过程 调用spring中的refresh方法来完成整个spring应用的启动，同时解析@ComponentScan，@Bean，@Import等注解；
+* 5.在解析@Import注解时 会把所有包含@Import注解的类都解析到，然后对import类进行分类 最后deferredImportSelectorHandler.process()完成整个EnableAutoConfiguration的加载

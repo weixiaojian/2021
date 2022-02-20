@@ -197,3 +197,30 @@
 * 3.prepareContext方法主要未上下文对象的创建，其中的load方法会将启动类做未一个BeanDefinition注册到registry；同时会解析@SpringBootApplication，@EnableAutoConfiguration等注解
 * 4.refreshContext方法主要会进行整个容器的刷新过程 调用spring中的refresh方法来完成整个spring应用的启动，同时解析@ComponentScan，@Bean，@Import等注解；
 * 5.在解析@Import注解时 会把所有包含@Import注解的类都解析到，然后对import类进行分类 最后deferredImportSelectorHandler.process()完成整个EnableAutoConfiguration的加载
+
+## 37.springboot的starter机制
+* 1.自定义一个配置类 里面包含了spring需要加载的所有的Bean
+* 2.将配置类的全路径写到META-INF/spring.factories文件中，springboot会自动加载该文件中的配置类
+* 3.将自定义的starter依赖到应用中 进行相应的属性配置(如：数据库连接等)，后续就可以直接使用
+
+## 38.springboot嵌入的tomcat
+* springboot已经内置了tomcat.jar 运行main方法的时候就会启动tomcat
+* 节省不需要安装外置tomcat 直接打jar包运行；部署环境只需要安装jdk后就可以运行应用程序
+
+## 39.mybatis的优缺点
+* 1.基于sql语句变成 相对灵活，sql是拆分在xml中的 不与程序代码偶尔，支持动态sql 可重用
+* 2.能与spring很好的集成，提供映射标签 支持对象与数据库表关系维护
+* 3.sql编程工作量大，对sql性能要求较高，对数据库依赖性强
+* 4.与JPA等ORM框架的区别为：mybatis不是面向对象编程 应用程序受表结构驱动，JPA则是直接面向对象的 表结构是根据对象生成
+* 5.单表操作、业务需求变动小的情况JPA更优，复杂的关联查询 需求变动大则是mybatis更好，JPA对数据库的依赖更小
+
+## 40.#{}和${}的区别
+```
+#{}预编译处理、占位符，在处理的时候会将sql中的#{}替换为？ 然后通过PreparedStatement来复制（可以预防sql注入）
+${}是字符串替换 拼接符，在处理的时候会直接将${}替换为变量的值 调用Statement来复制
+```
+
+## 41.mybatis插件(拦截器)
+* Mybatis只支持针对ParameterHandler、ResultSetHandler、StatementHandler、Executor这四种接口的插件
+* 实现mybatis的Interceptor接口，并复写其中的intercept()方法，然后给插件编写注解 指定要拦截那一接口的那些方法 invocation.proceed()执行具体的业务逻辑
+* 内部使用的是JDK的动态代理，为需要拦截的接口生成代理对象以实现接口方法拦截的功能，每当执行这四种接口对象的方法时 就会进入到拦截方法

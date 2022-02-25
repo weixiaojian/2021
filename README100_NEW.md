@@ -122,7 +122,13 @@
 * 将程序中交叉的业务逻辑(日志、事务等)，封装成一个切面 然后注入到目标对象中；
 * 可以对某些对象进行增强，也可以在某些方法执行前和执行后处理额外的事情
 
-## 26.BeanFactory和ApplicationContext区别
+## 26.spring循环依赖和三级缓存
+* 属性注入是在实例化之后的：A对象实例化，发现依赖B对象 > 实例化B对象 > B对象实例化的时候依赖A，此时A已经创建完成 所以B实例化成功 > B对象返回到A对象的属性注入方法上，A完成实例化
+* 三级缓存：一级（日常获取Bean的地方,key是BeanName Value是实例对象） < 二级（实例化完成还没属性注入，由三级转进来的，key是BeanName Value是实例对象） < 三级(key是BeanName Value是一个对象工厂ObjectFactory）
+* A对象实例化，需要依赖B(A放在三级) > 实例化B，依赖A就从三级中拿到ObjectFactory从而拿到A > B实例化成功，B移到一级，A移到二级缓存中 > A实例化完成，remove掉二级的A 放到一级缓存
+* 为什么要三级缓存：第三级缓存考虑AOP，第二级缓存考虑性能(不用每次都从工厂里面拿)，比如A对象是一个被AOP增量的对象，B依赖A时，得到的A肯定是代理对象的，三级缓存的Value是ObjectFactory，可以从里边拿到代理对象
+
+## 27.BeanFactory和ApplicationContext区别
 * ApplicationContext是BeanFactory的子接口 功能也更强大(支持国际化、加载多个配置文件等等)
 * BeanFactory是延迟加载的形式加载bean(使用时才创建)，ApplicationContext在初始化的时候就加载好了所有bean 这样更有利于检查依赖属性是否注入
 * ApplicationContext占的内存更高 启动更慢，但还能以声明的方式创建(使用ContextLoad )
